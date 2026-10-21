@@ -87,6 +87,14 @@ public record Dice
         return sum;
     }
 
+    /// <summary>
+    /// rolls the dice using the provided roll strategy
+    /// </summary>
+    /// <param name="rng"></param>
+    /// <returns></returns>
+    public int Roll(Random rng, DiceRollStrategy rollStrategy) 
+        => rollStrategy(rng, this);
+   
     
     /// <summary>The smallest total these dice can produce.</summary>
     public int Minimum => Count + Modifier;

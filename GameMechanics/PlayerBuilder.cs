@@ -1,3 +1,6 @@
+using TheWorld.Rules;
+using static TheWorld.Rules.DiceRollStrategies;
+
 namespace TheWorld.GameMechanics;
 
 /// <summary>
@@ -40,17 +43,38 @@ public record PlayerBuilder
     // and it checks no more than the Factory method we wrote in Lesson 5.
     // Which means we can do better!
     //------------------------------------------------------------------------------------
-    
+
     public PlayerBuilder WithLevel(PlayerLevel level) => this with { _level = level };
     public PlayerBuilder WithHealthPoints(HealthPoints hp) => this with { _healthPoints = hp };
     public PlayerBuilder WithAbilities(AbilityScore abilities) => this with { _abilities = abilities };
     public PlayerBuilder WithWallet(Money wallet) => this with { _wallet = wallet };
+    
+    
+    /// <summary>
+    /// Here's the traditional hard-core way to do this.
+    /// 3d6 for each score, rolled in order, and whatever comes up is what you get.
+    /// You could end up with all 3s or all 18s. And you only get one shot.
+    /// </summary>
+    public PlayerBuilder WithAbilities(Random rng) => this with
+    { _abilities = AbilityScore.Roll(rng, Dice.D6 with { Count = 3 }, Default)
+    };
     
     /// <summary>
     /// Puts the player together from whatever parts have been set.
     /// </summary>
     public Player Build() => 
         Player.Create(_name, _level, _healthPoints, _abilities, _wallet);
+    
+    /// <summary>
+    /// The Fully Strategy Based approach gives the programmer the power to
+    ///manipulate the outcome, or to
+    /// create undesirable ones. The scores come back unchecked. That
+    ///responsibility is outsourced to the
+    /// DiceRollStrategy you hand in.
+    /// </summary>
+    public PlayerBuilder WithAbilities(Random rng, Dice dice, DiceRollStrategy
+        strategy) => this with
+        { _abilities = AbilityScore.Roll(rng, dice, strategy) };
     
     #region Future Projects!
     /// <summary>
